@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Annotation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .media-container {
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        video, audio {
+            display: block;
+            margin: 10px 0;
+        }
+        .emotion-select, .likert-scale {
+            margin-top: 20px;
+        }
+        .comments-box {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .submit-btn {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .annotator-list {
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annotate Media</h1>
+
+    {% for media in media_files %}
+    <div class="media-container">
+        <h3>Media: {{ media.video.split('.')[0] }}</h3>
+        
+        <!-- Show media only if annotation count is less than 4 -->
+        {% if media.annotation_count < 4 %}
+        <!-- Video Section -->
+        <video controls width="600">
+            <source src="{{ url_for('static', filename='videos/' + media.video) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Audio Section -->
+        <audio controls>
+            <source src="{{ url_for('static', filename='audio/' + media.audio) }}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+
+        <!-- Text Transcript -->
+<div>
+    <h4>Text Transcript:</h4>
+    <p>{{ media.text_content | safe }}</p>
+</div>
+
+
+        <!-- Emotion Selection and Likert Scale -->
+        <form method="POST" action="/submit">
+            <input type="hidden" name="media_name" value="{{ media.video.split('.')[0] }}">
+
+            <h4>Select the emotion you think is most appropriate:</h4>
+            {% for emotion in ['Anger', 'Disgust', 'Fear', 'Happiness', 'Sadness', 'Surprise'] %}
+            <label>
+                <input type="radio" name="selected_emotion" value="{{ emotion }}" required>
+                {{ emotion }}
+            </label><br>
+            {% endfor %}
+
+            <div class="likert-scale">
+                <h4>Rate the selected emotion (1 = Least, 5 = Most):</h4>
+                {% for i in range(1, 6) %}
+                <label>
+                    <input type="radio" name="emotion_rating" value="{{ i }}" required>
+                    {{ i }}
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Annotator Name -->
+            <div>
+                <label for="annotator_name">Annotator Name:</label>
+                <input type="text" id="annotator_name" name="annotator_name" placeholder="Enter your name" required>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments">
+                <label for="comments">Comments (optional):</label>
+                <textarea name="comments" class="comments-box" placeholder="Add any comments here..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Submit Annotation</button>
+        </form>
+        {% else %}
+        <!-- Display a message if the video is fully annotated -->
+        <p><strong>This video has been annotated by 4 people. Further annotations are not allowed.</strong></p>
+        {% endif %}
+
+        <!-- Annotator Progress -->
+        <div class="annotator-list">
+            <h4>Annotators:</h4>
+            {% for annotator in media.annotators %}
+            <p>{{ loop.index }}. {{ annotator }}</p>
+            {% endfor %}
+        </div>
+
+        <div>
+            <p><strong>Total Annotations:</strong> {{ media.annotation_count }} / 4</p>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>

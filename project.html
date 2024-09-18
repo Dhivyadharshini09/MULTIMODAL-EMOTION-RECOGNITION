@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal emotion recognition in conversational videos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInTitle 1.5s forwards;
+        }
+
+        @keyframes fadeInTitle {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .flow div {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            width: 200px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.5);
+            animation: fadeInSteps 1s forwards;
+            cursor: pointer;
+        }
+
+        .flow div:nth-child(1) { animation-delay: 0.5s; }
+        .flow div:nth-child(2) { animation-delay: 0.7s; }
+        .flow div:nth-child(3) { animation-delay: 0.9s; }
+        .flow div:nth-child(4) { animation-delay: 1.1s; }
+        .flow div:nth-child(5) { animation-delay: 1.3s; }
+
+        .arrow {
+            font-size: 30px;
+            margin: 10px;
+            color: #333;
+            opacity: 0;
+            animation: fadeInArrow 1s forwards;
+        }
+
+        .arrow:nth-child(2) { animation-delay: 0.6s; }
+        .arrow:nth-child(4) { animation-delay: 0.8s; }
+        .arrow:nth-child(6) { animation-delay: 1s; }
+        .arrow:nth-child(8) { animation-delay: 1.2s; }
+
+        @keyframes fadeInSteps {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeInArrow {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flow div:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Progress bar styles */
+        .progress-container {
+            display: block;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 400px;
+            height: 30px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            line-height: 30px;
+            font-size: 16px;
+        }
+
+        /* Icon styles */
+        .downloaded-icon-container {
+            display: none;
+            margin-top: 20px;
+            font-size: 40px;
+            color: #4CAF50;
+        }
+
+        .downloaded-icon-container .icon {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Multimodal emotion recognition in conversational videos</h1>
+
+        <div class="flow">
+            <div id="downloadBtn">Download videos from reality shows</div>
+            
+            <div>Extract audio and text from video</div>
+            
+            <div>Preprocess video, audio and text</div>
+           
+            <div>Feature extraction</div>
+            
+            <div>Model building and evaluation</div>
+        </div>
+
+        <!-- Video Icon will appear here after download -->
+        <div class="downloaded-icon-container" id="downloadedIconContainer">
+            <div class="icon">🎥</div>
+            <p>Video downloaded successfully!</p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Downloading...</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get modal, button, and other elements
+        const modal = document.getElementById("myModal");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const closeBtn = document.getElementsByClassName("close")[0];
+        const progressBar = document.getElementById("progressBar");
+        const modalTitle = document.getElementById("modalTitle");
+        const downloadedIconContainer = document.getElementById("downloadedIconContainer");
+
+        // When the user clicks the download button, open the modal and start progress
+        downloadBtn.onclick = function () {
+            modal.style.display = "block";
+            simulateDownload();
+        }
+
+        // When the user clicks on close button (×), close the modal
+        closeBtn.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // Simulate download progress
+        function simulateDownload() {
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    progressBar.style.width = "100%";
+                    progressBar.innerHTML = "100%";
+                    modalTitle.innerHTML = "Download Complete";
+                    modal.style.display = "none"; // Close modal
+                    downloadedIconContainer.style.display = "block"; // Show icon after download
+                } else {
+                    width++;
+                    progressBar.style.width = width + "%";
+                    progressBar.innerHTML = width + "%";
+                }
+            }, 100); // Adjust the speed of progress here
+        }
+
+        // Close the modal if the user clicks outside of it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

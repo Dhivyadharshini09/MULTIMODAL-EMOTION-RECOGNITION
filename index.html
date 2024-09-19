@@ -57,28 +57,23 @@
     <div class="media-container">
         <h3>Media: {{ media.video.split('.')[0] }}</h3>
         
-        <!-- Show media only if annotation count is less than 4 -->
         {% if media.annotation_count < 4 %}
-        <!-- Video Section -->
         <video controls width="600">
-            <source src="{{ url_for('static', filename='videos/' + media.video) }}" type="video/mp4">
+            <source src="{{ url_for('static', filename='preprocessvideo/' + media.video) }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
-        <!-- Audio Section -->
         <audio controls>
-            <source src="{{ url_for('static', filename='audio/' + media.audio) }}" type="audio/wav">
+            <source src="{{ url_for('static', filename='preprocessaudio/' + media.audio) }}" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
 
-        <!-- Text Transcript -->
 <div>
     <h4>Text Transcript:</h4>
     <p>{{ media.text_content | safe }}</p>
 </div>
 
 
-        <!-- Emotion Selection and Likert Scale -->
         <form method="POST" action="/submit">
             <input type="hidden" name="media_name" value="{{ media.video.split('.')[0] }}">
 
@@ -100,27 +95,22 @@
                 {% endfor %}
             </div>
 
-            <!-- Annotator Name -->
             <div>
                 <label for="annotator_name">Annotator Name:</label>
                 <input type="text" id="annotator_name" name="annotator_name" placeholder="Enter your name" required>
             </div>
 
-            <!-- Comments Section -->
             <div class="comments">
                 <label for="comments">Comments (optional):</label>
                 <textarea name="comments" class="comments-box" placeholder="Add any comments here..."></textarea>
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" class="submit-btn">Submit Annotation</button>
         </form>
         {% else %}
-        <!-- Display a message if the video is fully annotated -->
         <p><strong>This video has been annotated by 4 people. Further annotations are not allowed.</strong></p>
         {% endif %}
 
-        <!-- Annotator Progress -->
         <div class="annotator-list">
             <h4>Annotators:</h4>
             {% for annotator in media.annotators %}
@@ -135,3 +125,4 @@
     {% endfor %}
 </body>
 </html>
+
